@@ -6,6 +6,7 @@ package com.wsdltracker.parser;
 import java.util.Stack;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.wsdltracker.beans.WSDLInfoBean;
 import com.wsdltracker.commons.WSDLCommons;
@@ -32,22 +33,67 @@ public class WSDLDataProcessor {
 				}
 				catch(NullPointerException e){}
 				_bean.addComplexTypeDefinition(parentCtName, elementName, elementType);
-				//System.out.print(parentCtName+"~~"+elementName+"~~"+elementType);
 			}
 			else{
 				String elementName = _currentNode.getAttributes().getNamedItem("name").getNodeValue();
 				String elementType = _currentNode.getAttributes().getNamedItem("type").getNodeValue();;
 				_bean.addWSDLTypeElementName(elementName, elementType);
-				//System.out.print(elementName+"~~"+elementType);
 			}
-			//System.out.println();
 		}
 		if(currNodeName.equals(WSDLCommons.XSD_NODENAME_SIMPLETYPE)){
 			String elementName = _currentNode.getAttributes().getNamedItem("name").getNodeValue();
 			String elementType = _currentNode.getChildNodes().item(1).getAttributes().getNamedItem("base").getNodeValue();;
-			//System.out.print(elementName+"~~"+elementType);
 			_bean.addSimpleTypeDefinition(elementName, elementType);
-			//System.out.println();
+		}
+		if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_MESSAGE)){
+			String messageName = _currentNode.getAttributes().getNamedItem("name").getNodeValue();
+			NodeList nlParts = _currentNode.getChildNodes();
+			for(int i=0; i<nlParts.getLength(); i++){
+				Node childNode = nlParts.item(i); 
+				if(childNode.getNodeType() == Node.ELEMENT_NODE){
+					String partName = childNode.getAttributes().getNamedItem("name").getNodeValue();
+					String partType = childNode.getAttributes().getNamedItem("type").getNodeValue();
+					partType = partType.substring(partType.indexOf(":")+1);
+					_bean.addMessageDefinition(messageName, partName, partType);
+				}
+			}
+		}
+		if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_PORTTYPE)){
+			String portName = _currentNode.getAttributes().getNamedItem("name").getNodeValue();
+			NodeList nlOperations = _currentNode.getChildNodes();
+			for(int i=0; i<nlOperations.getLength(); i++){
+				Node childNode = nlOperations.item(i); 
+				if(childNode.getNodeType() == Node.ELEMENT_NODE){
+					String childNodeName = childNode.getNodeName();
+					childNodeName = childNodeName.substring(childNodeName.indexOf(":")+1); 
+					if(childNodeName.equals(WSDLCommons.WSDL_NODENAME_OPERATION)){
+						String operationName = (_currentNode.getChildNodes().item(1)).getAttributes().getNamedItem("name").getNodeValue();
+						_bean.addPortDefinition(portName, operationName);
+					}
+				}
+			}
+		}
+		if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_OPERATION)){
+			Node operationNameNode = _currentNode.getAttributes().getNamedItem("name");
+			if(operationNameNode!=null){
+				String operationName = operationNameNode.getNodeValue();
+				if(!_bean.checkForOperation(operationName)){
+					NodeList nlData = _currentNode.getChildNodes();
+					for(int i=0; i<nlData.getLength(); i++){
+						Node childNode = nlData.item(i); 
+						if(childNode.getNodeType() == Node.ELEMENT_NODE){
+							String nodeName = childNode.getNodeName();
+							nodeName = nodeName.substring(nodeName.indexOf(":")+1);
+							String nodeType = childNode.getAttributes().getNamedItem("message").getNodeValue();
+							nodeType = nodeType.substring(nodeType.indexOf(":")+1);
+							_bean.addOperationDefinition(operationName, nodeName, nodeType);
+						}
+					}
+				}
+			}
+		}
+		else{
+			
 		}
 	}
 }

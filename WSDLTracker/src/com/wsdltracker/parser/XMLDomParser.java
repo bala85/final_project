@@ -11,6 +11,7 @@ import java.util.Stack;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -18,7 +19,10 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import com.wsdltracker.exception.WSDLTrackerException;
+import com.wsdltracker.WSDLTrackerLogger;
 import com.wsdltracker.beans.WSDLInfoBean;
+import com.wsdltracker.helper.WSDLHelper;
 
 /**
  * @author Bala Rajagopal
@@ -28,23 +32,43 @@ import com.wsdltracker.beans.WSDLInfoBean;
 
 public class XMLDomParser implements ErrorHandler {
 	
+	private static String className = XMLDomParser.class.getName();
+	
 	private ArrayList<String> nodePath = new ArrayList<String>();
 	private WSDLInfoBean wsdlBean = null;
 	private Stack<Node> nodeStack = null;
 
-	public void parseXML(File inFile, WSDLInfoBean _wsdlInfoBean) throws IOException, SAXException, ParserConfigurationException
+	public void parseXML(File inFile, WSDLInfoBean _wsdlInfoBean) throws WSDLTrackerException
 	{
 		wsdlBean = _wsdlInfoBean;
 		nodeStack = new Stack<Node>();
-		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inFile);
+		Document doc = null;
+		try {
+			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inFile);
+		} catch (SAXException e) {
+			throw new WSDLTrackerException(e, className, "parseXML", Level.FATAL);
+		} catch (IOException e) {
+			throw new WSDLTrackerException(e, className, "parseXML", Level.FATAL);
+		} catch (ParserConfigurationException e) {
+			throw new WSDLTrackerException(e, className, "parseXML", Level.FATAL);
+		}
 		Node n = doc.getDocumentElement();
 		if(n.getNodeType() == Node.ELEMENT_NODE)
 			parseNode(n);
 	}
 	
-	public void parseXML(String inData) throws IOException, SAXException, ParserConfigurationException
+	public void parseXML(String inData) throws WSDLTrackerException
 	{
-		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inData);
+		Document doc = null;
+		try {
+			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inData);
+		} catch (SAXException e) {
+			throw new WSDLTrackerException(e, className, "parseXML", Level.FATAL);
+		} catch (IOException e) {
+			throw new WSDLTrackerException(e, className, "parseXML", Level.FATAL);
+		} catch (ParserConfigurationException e) {
+			throw new WSDLTrackerException(e, className, "parseXML", Level.FATAL);
+		}
 		Node n = doc.getDocumentElement();
 		if(n.getNodeType() == Node.ELEMENT_NODE)
 			parseNode(n);
@@ -57,7 +81,7 @@ public class XMLDomParser implements ErrorHandler {
 		{
 			nodePath.add(n.getNodeName());
 			nodeStack.push(n);
-			//System.out.println(WSDLHelper.getStackTrace(nodeStack));
+			WSDLTrackerLogger.logThis(Level.TRACE, WSDLHelper.getStackTrace(nodeStack));
 			WSDLDataProcessor.doWSDLNodeProcessing(n, nodeStack, wsdlBean);
 			//System.out.println("Start: "+WSDLHelper.getLastNodeName(nodePath));
 			/*for(int i=0; i<n.getAttributes().getLength();i++){
@@ -75,7 +99,7 @@ public class XMLDomParser implements ErrorHandler {
 			}
 			//System.out.println("End: "+nodeStack.peek());
 			nodeStack.pop();
-			//System.out.println(WSDLHelper.getStackTrace(nodeStack));
+			WSDLTrackerLogger.logThis(Level.TRACE, WSDLHelper.getStackTrace(nodeStack));
 			nodePath.remove(n.getNodeName());
 		}
 		else
@@ -85,7 +109,7 @@ public class XMLDomParser implements ErrorHandler {
 				nodePath.add(n.getNodeName());
 				//System.out.println(WSDLHelper.getLastNodeName(nodePath));
 				nodeStack.push(n);
-				//System.out.println(WSDLHelper.getStackTrace(nodeStack));
+				WSDLTrackerLogger.logThis(Level.TRACE, WSDLHelper.getStackTrace(nodeStack));
 				WSDLDataProcessor.doWSDLNodeProcessing(n, nodeStack, wsdlBean);
 				/*for(int i=0; i<n.getAttributes().getLength();i++){
 					Node attNode = n.getAttributes().item(i);
@@ -96,6 +120,7 @@ public class XMLDomParser implements ErrorHandler {
 				//System.out.println(WSDLHelper.getLastNodeName(nodePath));
 				nodeStack.pop();
 				//System.out.println(WSDLHelper.getStackTrace(nodeStack));
+				WSDLTrackerLogger.logThis(Level.TRACE, WSDLHelper.getStackTrace(nodeStack));
 				nodePath.remove(n.getNodeName());
 			}
 		}

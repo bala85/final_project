@@ -19,16 +19,28 @@ public class WSDLInfoBean {
 	private HashMap<String, String> wsdlInputs = null; // Mapping to Store WSDL {Input TagName --> ComplexType} 
 	private HashMap<String, String> wsdlOutputs = null; // Mapping to Store WSDL {Output TagName --> ComplexType}
 	
+	// Mapping to capture message --> {partName --> partType} relationship
+	private HashMap<String, HashMap<String, String>> wsdlMessages = null; 
+	
 	// Mapping to capture the various complexTypes --> {elementName --> elementType} relationships
 	private HashMap<String, HashMap<String, String>> complexTypes = null; 
 	private HashMap<String, String> simpleTypes = null;
 	private HashMap<String, String> elementNames = null; // Mapping to capture {elementNames --> complexType} relationship
+	private HashMap<String, ArrayList<String>> portNames = null; // Mapping to capture {portName --> operation} relationship
+	private HashMap<String, HashMap<String, String>> operations = null;
 	
+	/**
+	 * Default constructor 
+	 */
 	public WSDLInfoBean(){
 		complexTypes = new HashMap<String, HashMap<String,String>>();
 		simpleTypes = new HashMap<String, String>();
 		elementNames = new HashMap<String, String>();
+		wsdlMessages = new HashMap<String, HashMap<String,String>>();
+		portNames = new HashMap<String, ArrayList<String>>();
+		operations = new HashMap<String, HashMap<String,String>>();		
 	}
+	
 	/**
 	 * Add a WSDL Input
 	 * @param _tagName is the WSDL Input tagName
@@ -165,6 +177,98 @@ public class WSDLInfoBean {
 		return complexTypes.get(_complexType).get(_elementName);
 	}
 	
+	/**
+	 * Add a message definition
+	 * @param _messageName is the messageType name
+	 * @param _partName is the part name
+	 * @param _partType is the part type
+	 */
+	public void addMessageDefinition(String _messageName, String _partName, String _partType){
+		if(!wsdlMessages.containsKey(_messageName))
+			wsdlMessages.put(_messageName, new HashMap<String, String>());
+		wsdlMessages.get(_messageName).put(_partName, _partType);	
+	}
+	
+	/**
+	 * Add a message definition
+	 * @return a String array of all messages in the WSDL
+	 */
+	public String[] getAllMessages(){
+		ArrayList<String> messageNames = new ArrayList<String>();
+		Iterator<String> itMessages = wsdlMessages.keySet().iterator();
+		while(itMessages.hasNext()){
+			messageNames.add(itMessages.next());
+		}
+		return (String[]) messageNames.toArray();
+	}
+	
+	/**
+	 * Associate an operation to a port
+	 * @param _portName is the portName
+	 * @param _operation is the operationName
+	 */
+	public void addPortDefinition(String _portName, String _operation){
+		if(!portNames.containsKey(_portName))
+			portNames.put(_portName, new ArrayList<String>());
+		portNames.get(_portName).add(_operation);
+	}
+	
+	/**
+	 * Get all the ports in the WSDL
+	 * @return a String array of all the portNames in the WSDL
+	 */
+	public String[] getAllPorts(){
+		ArrayList<String> portName = new ArrayList<String>();
+		Iterator<String> itPortNames = portNames.keySet().iterator();
+		while(itPortNames.hasNext()){
+			portName.add(itPortNames.next());
+		}
+		return (String[]) portName.toArray();
+	}
+	
+	/**
+	 * Get all the operations associated to a port
+	 * @param _portName the name of the port
+	 * @return a String array of all the operations associated with a port
+	 */
+	public String[] getAllOperationsInPort(String _portName){
+		ArrayList<String> operationNames =  portNames.get(_portName);
+		return (String[]) operationNames.toArray();
+	}
+	
+	/**
+	 * Add an operation definition
+	 * @param _operationName is the name of the operation
+	 * @param _type is the type of operation (input/output)
+	 * @param _dataType is the dataType associated to the operation
+	 */
+	public void addOperationDefinition(String _operationName, String _type, String _dataType){
+		if(!operations.containsKey(_operationName))
+			operations.put(_operationName, new HashMap<String, String>());
+		operations.get(_operationName).put(_type, _dataType);
+	}
+	
+	/**
+	 * Get all the operations contained in the WSDL
+	 * @return a String array of all the operations in the WSDL
+	 */
+	public String[] getAllOperations(){
+		ArrayList<String> operationName = new ArrayList<String>();
+		Iterator<String> itOperationNames = operations.keySet().iterator();
+		while(itOperationNames.hasNext()){
+			operationName.add(itOperationNames.next());
+		}
+		return (String[]) operationName.toArray();
+	}
+	
+	/**
+	 * Check for availability of an Operation
+	 * @param _operationName is the operationName
+	 * @return boolean value indicating the existence
+	 */
+	public boolean checkForOperation(String _operationName){
+		return operations.containsKey(_operationName);
+	}
 	/**
 	 * Add a simpleType definition
 	 * @param _simpleTypeName is the simpleType name
