@@ -21,8 +21,14 @@ public class WSDLInfoBean {
 	
 	// Mapping to capture the various complexTypes --> {elementName --> elementType} relationships
 	private HashMap<String, HashMap<String, String>> complexTypes = null; 
+	private HashMap<String, String> simpleTypes = null;
 	private HashMap<String, String> elementNames = null; // Mapping to capture {elementNames --> complexType} relationship
 	
+	public WSDLInfoBean(){
+		complexTypes = new HashMap<String, HashMap<String,String>>();
+		simpleTypes = new HashMap<String, String>();
+		elementNames = new HashMap<String, String>();
+	}
 	/**
 	 * Add a WSDL Input
 	 * @param _tagName is the WSDL Input tagName
@@ -137,8 +143,8 @@ public class WSDLInfoBean {
 	}
 	
 	/**
-	 * Get all the complexType names
-	 * @return a String array of all the complexTypes associated with this WSDL
+	 * Get all the complexType Element names
+	 * @return a String array of all the elements associated with this complexTypes in the WSDL
 	 */
 	public String[] getAllComplexTypeElementNames(String _complexTypeName){
 		ArrayList<String> complexTypeElementNames = new ArrayList<String>();
@@ -157,6 +163,30 @@ public class WSDLInfoBean {
 	 */
 	public String getComplexTypeElementType(String _complexType, String _elementName){
 		return complexTypes.get(_complexType).get(_elementName);
+	}
+	
+	/**
+	 * Add a simpleType definition
+	 * @param _simpleTypeName is the simpleType name
+	 * @param _simpleTypeType is the simpleType type (tongue twister :P)
+	 */
+	public void addSimpleTypeDefinition(String _simpleTypeName, String _simpleTypeType){
+		if(!simpleTypes.containsKey(_simpleTypeName)){
+			simpleTypes.put(_simpleTypeName, _simpleTypeType);
+		}
+	}
+	
+	/**
+	 * Get all the simpleType names
+	 * @return a String array of all the simpleType names
+	 */
+	public String[] getAllSimpleTypes(){
+		ArrayList<String> simpleTypes = new ArrayList<String>();
+		Iterator<String> itSimpleTypes = simpleTypes.iterator();
+		while(itSimpleTypes.hasNext()){
+			simpleTypes.add(itSimpleTypes.next());
+		}
+		return (String[]) simpleTypes.toArray();
 	}
 	
 	/**

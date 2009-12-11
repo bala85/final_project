@@ -26,7 +26,10 @@ public class WSDLTestMain {
 		XMLDomParser parser = new XMLDomParser();
 		try {
 			File inputFile = new File("1personbicycle4wheeledcar_price_service.wsdl");
-			parser.parseXML(inputFile, new WSDLInfoBean());
+			//File inputFile = new File("1personbicyclecar_price_Kohlservice.wsdl");
+			WSDLInfoBean wsdlData = new WSDLInfoBean();
+			parser.parseXML(inputFile, wsdlData);
+			//System.out.println(wsdlData);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
