@@ -21,7 +21,12 @@ public class WSDLDataProcessor {
 
 	protected static void doWSDLNodeProcessing(Node _currentNode, Stack<Node> _nodeStack, WSDLInfoBean _bean){
 		String currNodeName = _currentNode.getNodeName();
-		currNodeName = currNodeName.substring(currNodeName.indexOf(":")+1);
+		String qualifier = null;
+		if(currNodeName.indexOf(":")>0){
+			qualifier = currNodeName.substring(0, currNodeName.indexOf(":"));
+			currNodeName = currNodeName.substring(currNodeName.indexOf(":")+1);
+		}
+		
 		if(currNodeName.equals(WSDLCommons.XSD_NODENAME_ELEMENT)){
 			Node parentCtypeNode = WSDLHelper.isInStack(_nodeStack, WSDLCommons.XSD_NODENAME_COMPLEXTYPE, WSDLCommons.QUALIFIER_XSD);
 			if(parentCtypeNode!=null){
@@ -33,6 +38,7 @@ public class WSDLDataProcessor {
 				}
 				catch(NullPointerException e){}
 				_bean.addComplexTypeDefinition(parentCtName, elementName, elementType);
+				_bean.addWSDLTypeElementName(elementName, elementType);
 			}
 			else{
 				String elementName = _currentNode.getAttributes().getNamedItem("name").getNodeValue();
@@ -40,12 +46,12 @@ public class WSDLDataProcessor {
 				_bean.addWSDLTypeElementName(elementName, elementType);
 			}
 		}
-		if(currNodeName.equals(WSDLCommons.XSD_NODENAME_SIMPLETYPE)){
+		else if(currNodeName.equals(WSDLCommons.XSD_NODENAME_SIMPLETYPE)){
 			String elementName = _currentNode.getAttributes().getNamedItem("name").getNodeValue();
 			String elementType = _currentNode.getChildNodes().item(1).getAttributes().getNamedItem("base").getNodeValue();;
 			_bean.addSimpleTypeDefinition(elementName, elementType);
 		}
-		if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_MESSAGE)){
+		else if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_MESSAGE)){
 			String messageName = _currentNode.getAttributes().getNamedItem("name").getNodeValue();
 			NodeList nlParts = _currentNode.getChildNodes();
 			for(int i=0; i<nlParts.getLength(); i++){
@@ -58,7 +64,7 @@ public class WSDLDataProcessor {
 				}
 			}
 		}
-		if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_PORTTYPE)){
+		else if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_PORTTYPE)){
 			String portName = _currentNode.getAttributes().getNamedItem("name").getNodeValue();
 			NodeList nlOperations = _currentNode.getChildNodes();
 			for(int i=0; i<nlOperations.getLength(); i++){
@@ -67,13 +73,30 @@ public class WSDLDataProcessor {
 					String childNodeName = childNode.getNodeName();
 					childNodeName = childNodeName.substring(childNodeName.indexOf(":")+1); 
 					if(childNodeName.equals(WSDLCommons.WSDL_NODENAME_OPERATION)){
-						String operationName = (_currentNode.getChildNodes().item(1)).getAttributes().getNamedItem("name").getNodeValue();
-						_bean.addPortDefinition(portName, operationName);
+						String operationName = childNode.getAttributes().getNamedItem("name").getNodeValue();
+						_bean.addPortTypeDefinition(portName, operationName);
+						NodeList nlOperationIo = childNode.getChildNodes();
+						for(int iOper=0; iOper<nlOperationIo.getLength(); iOper++){
+							Node ioChild = nlOperationIo.item(iOper);
+							if(ioChild.getNodeType() == Node.ELEMENT_NODE){
+								String ioNodeName = ioChild.getNodeName();
+								ioNodeName = ioNodeName.substring(ioNodeName.indexOf(":")+1);
+								if(ioNodeName.equals(WSDLCommons.WSDL_NODENAME_INPUT) 
+										|| ioNodeName.equals(WSDLCommons.WSDL_NODENAME_OUTPUT)){
+									String ioMessage = ioChild.getAttributes().getNamedItem("message").getNodeValue();
+									ioMessage = ioMessage.substring(ioMessage.indexOf(":")+1);
+									if(ioNodeName.equals(WSDLCommons.WSDL_NODENAME_INPUT))
+										_bean.addWsdlInput(operationName, ioMessage);
+									else
+										_bean.addWsdlOutput(operationName, ioMessage);
+								}
+							}
+						}
 					}
 				}
 			}
 		}
-		if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_OPERATION)){
+		else if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_OPERATION)){
 			Node operationNameNode = _currentNode.getAttributes().getNamedItem("name");
 			if(operationNameNode!=null){
 				String operationName = operationNameNode.getNodeValue();
@@ -92,8 +115,31 @@ public class WSDLDataProcessor {
 				}
 			}
 		}
-		else{
-			
+		else if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_BINDING)){
+			if(qualifier==null || qualifier.equals(WSDLCommons.QUALIFIER_WSDL_TAG)){
+				String _bindingName = _currentNode.getAttributes().
+					getNamedItem("name").getNodeValue();
+				String _bindingType = _currentNode.getAttributes().
+					getNamedItem("type").getNodeValue();
+				_bean.addBindingDefinition(_bindingName, _bindingType);
+			}
+		}
+		else if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_SERVICE)){
+			String _ServiceName = _currentNode.getAttributes().
+				getNamedItem("name").getNodeValue();
+			_bean.setServiceName(_ServiceName);
+		}
+		else if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_PORT)){
+			String _serviceName = _currentNode.getAttributes().
+				getNamedItem("name").getNodeValue();
+			String _binding = _currentNode.getAttributes().
+				getNamedItem("binding").getNodeValue();
+			_bean.addPortDefinition(_serviceName, _binding);
+		}
+		else if(qualifier!=null && 
+				currNodeName.equals(WSDLCommons.WSDL_NODENAME_ADDRESS)){
+			String _wsdlLoc = _currentNode.getAttributes().getNamedItem("location").getNodeValue();
+			_bean.setWsdlAddress(_wsdlLoc);
 		}
 	}
 }

@@ -25,8 +25,10 @@ public class WSDLTestMain {
 		XMLDomParser parser = new XMLDomParser();
 		try {
 			WSDLTrackerLogger.setWSDLTrackerLogger(WSDLCommons.LOGTYPE_CONSOLE);
-			//File inputFile = new File("1personbicycle4wheeledcar_price_service.wsdl");
-			File inputFile = new File("1personbicyclecar_price_Kohlservice.wsdl");
+			File inputFile = new File("1personbicycle4wheeledcar_price_service.wsdl");
+			//File inputFile = new File("1personbicyclecar_price_Kohlservice.wsdl");
+			//File inputFile = new File("AmazonWS.wsdl");
+			//File inputFile = new File("google.wsdl");
 			WSDLInfoBean wsdlData = new WSDLInfoBean();
 			parser.parseXML(inputFile, wsdlData);
 			WSDLTrackerLogger.logThis(Level.DEBUG,wsdlData);

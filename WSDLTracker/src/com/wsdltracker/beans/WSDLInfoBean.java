@@ -15,9 +15,10 @@ import java.util.Iterator;
 public class WSDLInfoBean {
 	
 	private String wsdlName = null;
-	private String wsdlBinding = null;
-	private HashMap<String, String> wsdlInputs = null; // Mapping to Store WSDL {Input TagName --> ComplexType} 
-	private HashMap<String, String> wsdlOutputs = null; // Mapping to Store WSDL {Output TagName --> ComplexType}
+	private String wsdlAddress = null;
+	private HashMap<String, String> wsdlBindings = null;
+	private HashMap<String, String> wsdlInputs = null; // Mapping to Store WSDL {OperationName --> Message} 
+	private HashMap<String, String> wsdlOutputs = null; // Mapping to Store WSDL {OperationName --> Message}
 	
 	// Mapping to capture message --> {partName --> partType} relationship
 	private HashMap<String, HashMap<String, String>> wsdlMessages = null; 
@@ -26,8 +27,9 @@ public class WSDLInfoBean {
 	private HashMap<String, HashMap<String, String>> complexTypes = null; 
 	private HashMap<String, String> simpleTypes = null;
 	private HashMap<String, String> elementNames = null; // Mapping to capture {elementNames --> complexType} relationship
-	private HashMap<String, ArrayList<String>> portNames = null; // Mapping to capture {portName --> operation} relationship
+	private HashMap<String, ArrayList<String>> portTypeNames = null; // Mapping to capture {portTypeName --> operation} relationship
 	private HashMap<String, HashMap<String, String>> operations = null;
+	private HashMap<String, String> port = null;
 	
 	/**
 	 * Default constructor 
@@ -37,96 +39,78 @@ public class WSDLInfoBean {
 		simpleTypes = new HashMap<String, String>();
 		elementNames = new HashMap<String, String>();
 		wsdlMessages = new HashMap<String, HashMap<String,String>>();
-		portNames = new HashMap<String, ArrayList<String>>();
-		operations = new HashMap<String, HashMap<String,String>>();		
+		portTypeNames = new HashMap<String, ArrayList<String>>();
+		operations = new HashMap<String, HashMap<String,String>>();
+		wsdlBindings = new HashMap<String, String>();
+		port = new HashMap<String, String>();
+		wsdlInputs = new HashMap<String, String>();
+		wsdlOutputs = new HashMap<String, String>();
 	}
 	
 	/**
 	 * Add a WSDL Input
-	 * @param _tagName is the WSDL Input tagName
-	 * @param _ctypeName is the ComplexType associated with the input
+	 * @param _operationName is the Operation Name
+	 * @param _messageName is the Message Name
 	 */
-	public void addWsdlInput(String _tagName, String _ctypeName){
-		wsdlInputs.put(_tagName, _ctypeName);
+	public void addWsdlInput(String _operationName, String _messageName){
+		wsdlInputs.put(_operationName, _messageName);
 	}
 	
 	/**
-	 * Get the complexType associated with a WSDL tagName 
-	 * @param _tagName is the tagName
+	 * Get the Message associated with a WSDL Operation 
+	 * @param _operationName is the tagName
 	 * @return the associated complexType value
 	 */
-	public String getWsdlInput(String _tagName){
-		return wsdlInputs.get(_tagName);
-	}
-
-	/**
-	 * Get all the WSDL input tagNames
-	 * @return a String array of all the input elements
-	 */
-	public String[] getAllWsdlInputNames(){
-		ArrayList<String> inputNames = new ArrayList<String>();
-		Iterator<String> itInputNames = wsdlInputs.keySet().iterator();
-		while(itInputNames.hasNext()){
-			inputNames.add((String)itInputNames.next());
-		}
-		return (String[]) inputNames.toArray();
+	public String getWsdlInput(String _operationName){
+		return wsdlInputs.get(_operationName);
 	}
 	
 	/**
-	 * Get all the WSDL input complexTypes
-	 * @return a String array of all the input complexTypes
+	 * Get all the WSDL input mesasgeTypes
+	 * @return a String array of all the input mesasgeTypes
 	 */
-	public String[] getAllWsdlInputTypes(){
-		ArrayList<String> inputTypes = new ArrayList<String>();
-		Iterator<String> itInputTypes = wsdlInputs.values().iterator();
-		while(itInputTypes.hasNext()){
-			inputTypes.add((String)itInputTypes.next());
+	public String[] getAllWsdlInputMessages(){
+		ArrayList<String> messageTypes = new ArrayList<String>();
+		Iterator<String> itMessageTypes = wsdlInputs.values().iterator();
+		while(itMessageTypes.hasNext()){
+			messageTypes.add((String)itMessageTypes.next());
 		}
-		return (String[]) inputTypes.toArray();
+		String[] retVal = new String[messageTypes.size()];
+		messageTypes.toArray(retVal);
+		return retVal;
 	}
 	
 	/**
 	 * Add a WSDL Output
-	 * @param _tagName is the WSDL Output tagName
-	 * @param _ctypeName is the ComplexType associated with the output
+	 * @param _operationName is the WSDL Operation Name
+	 * @param _messageName is the Message Name
 	 */
-	public void addWsdlOutput(String _tagName, String _ctypeName){
-		wsdlOutputs.put(_tagName, _ctypeName);
+	public void addWsdlOutput(String _operationName, String _messageName){
+		wsdlOutputs.put(_operationName, _messageName);
 	}
 	
 	/**
-	 * Get the complexType associated with WSDL tagName
-	 * @param _tagName is the tagName
-	 * @return the associated complexType value
+	 * Get the message associated with WSDL operation
+	 * @param _operationName is the operationName
+	 * @return the associated Message Name
 	 */
-	public String getWsdlOutput(String _tagName){
-		return wsdlOutputs.get(_tagName);
+	public String getWsdlOutput(String _operationName){
+		return wsdlOutputs.get(_operationName);
 	}
 	
 	/**
-	 * Get all the WSDL output tagNames
-	 * @return a String array of all the output elements
+	 * Get all the WSDL output messageTypes
+	 * @return a String array of all the output messageTypes
 	 */
-	public String[] getAllWsdlOutputNames(){
-		ArrayList<String> outputNames = new ArrayList<String>();
-		Iterator<String> itOutputNames = wsdlInputs.keySet().iterator();
-		while(itOutputNames.hasNext()){
-			outputNames.add((String)itOutputNames.next());
-		}
-		return (String[]) outputNames.toArray();
-	}
-	
-	/**
-	 * Get all the WSDL output complexTypes
-	 * @return a String array of all the output complexTypes
-	 */
-	public String[] getAllWsdlOutputTypes(){
-		ArrayList<String> outputTypes = new ArrayList<String>();
+	public String[] getAllWsdlOutputMessages(){
+		ArrayList<String> messageTypes = new ArrayList<String>();
 		Iterator<String> itOutputTypes = wsdlInputs.values().iterator();
 		while(itOutputTypes.hasNext()){
-			outputTypes.add((String)itOutputTypes.next());
+			messageTypes.add((String)itOutputTypes.next());
 		}
-		return (String[]) outputTypes.toArray();
+		String[] retVal = new String[messageTypes.size()];
+		messageTypes.toArray(retVal);
+		return retVal;
 	}
 	
 	/**
@@ -151,7 +135,9 @@ public class WSDLInfoBean {
 		while(itComplexTypes.hasNext()){
 			complexTypeNames.add(itComplexTypes.next());
 		}
-		return (String[]) complexTypeNames.toArray();
+		String[] retVal = new String[complexTypeNames.size()];
+		complexTypeNames.toArray(retVal);
+		return retVal;
 	}
 	
 	/**
@@ -164,7 +150,9 @@ public class WSDLInfoBean {
 		while(itComplexTypeElementNm.hasNext()){
 			complexTypeElementNames.add(itComplexTypeElementNm.next());
 		}
-		return (String[]) complexTypeElementNames.toArray();
+		String[] retVal = new String[complexTypeElementNames.size()];
+		complexTypeElementNames.toArray(retVal);
+		return retVal;
 	}
 	
 	/**
@@ -199,7 +187,9 @@ public class WSDLInfoBean {
 		while(itMessages.hasNext()){
 			messageNames.add(itMessages.next());
 		}
-		return (String[]) messageNames.toArray();
+		String[] retVal = new String[messageNames.size()];
+		messageNames.toArray(retVal);
+		return retVal;
 	}
 	
 	/**
@@ -207,23 +197,58 @@ public class WSDLInfoBean {
 	 * @param _portName is the portName
 	 * @param _operation is the operationName
 	 */
-	public void addPortDefinition(String _portName, String _operation){
-		if(!portNames.containsKey(_portName))
-			portNames.put(_portName, new ArrayList<String>());
-		portNames.get(_portName).add(_operation);
+	public void addPortTypeDefinition(String _portTypeName, String _operation){
+		if(!portTypeNames.containsKey(_portTypeName))
+			portTypeNames.put(_portTypeName, new ArrayList<String>());
+		portTypeNames.get(_portTypeName).add(_operation);
 	}
 	
 	/**
-	 * Get all the ports in the WSDL
-	 * @return a String array of all the portNames in the WSDL
+	 * Associate a port with the service
+	 * @param _portName is the portName
+	 * @param _binding is the binding
 	 */
-	public String[] getAllPorts(){
+	public void addPortDefinition(String _portName, String _binding){
+		port.put(_portName, _binding);
+	}
+		
+	/**
+	 * Get all the port names
+	 * @return
+	 */
+	public String[] getAllPortNames(){
+		ArrayList<String> keySet = new ArrayList<String>();
+		Iterator<String> itKeys = port.keySet().iterator();
+		while(itKeys.hasNext()){
+			keySet.add(itKeys.next());
+		}
+		String[] retVal = new String[keySet.size()];
+		keySet.toArray(retVal);
+		return retVal;
+	}
+	
+	/**
+	 * Get the binding associated with a port
+	 * @param _portName is the portName
+	 * @return the binding associated to the port
+	 */
+	public String getBindingByPortName(String _portName){
+		return port.get(_portName);
+	}
+	
+	/**
+	 * Get all the portTypes in the WSDL
+	 * @return a String array of all the portTypeNames in the WSDL
+	 */
+	public String[] getAllPortTypes(){
 		ArrayList<String> portName = new ArrayList<String>();
-		Iterator<String> itPortNames = portNames.keySet().iterator();
+		Iterator<String> itPortNames = portTypeNames.keySet().iterator();
 		while(itPortNames.hasNext()){
 			portName.add(itPortNames.next());
 		}
-		return (String[]) portName.toArray();
+		String[] retVal = new String[portName.size()];
+		portName.toArray(retVal);
+		return retVal;
 	}
 	
 	/**
@@ -231,9 +256,42 @@ public class WSDLInfoBean {
 	 * @param _portName the name of the port
 	 * @return a String array of all the operations associated with a port
 	 */
-	public String[] getAllOperationsInPort(String _portName){
-		ArrayList<String> operationNames =  portNames.get(_portName);
+	public String[] getAllOperationsInPortType(String _portName){
+		ArrayList<String> operationNames =  portTypeNames.get(_portName);
 		return (String[]) operationNames.toArray();
+	}
+	
+	/**
+	 * Add a binding definition
+	 * @param _bindingName is the binding name
+	 * @param _portType is the port type associated to the binding
+	 */
+	public void addBindingDefinition(String _bindingName, String _portType){
+		wsdlBindings.put(_bindingName, _portType);
+	}
+	
+	/**
+	 * Get all the Bindings in the WSDL
+	 * @return a String array of all the binding names
+	 */
+	public String[] getAllWsdlBindings(){
+		ArrayList<String> bindingNames = new ArrayList<String>();
+		Iterator<String> itBindingNames = wsdlBindings.keySet().iterator();
+		while(itBindingNames.hasNext()){
+			bindingNames.add(itBindingNames.next());
+		}
+		String[] retVal = new String[bindingNames.size()];
+		bindingNames.toArray(retVal);
+		return retVal;
+	}
+	
+	/**
+	 * Get the port type of a binding
+	 * @param _bindingName is the binding name
+	 * @return the port type associated with the binding
+	 */
+	public String getBindingPortType(String _bindingName){
+		return wsdlBindings.get(_bindingName);
 	}
 	
 	/**
@@ -258,7 +316,9 @@ public class WSDLInfoBean {
 		while(itOperationNames.hasNext()){
 			operationName.add(itOperationNames.next());
 		}
-		return (String[]) operationName.toArray();
+		String[] retVal = new String[operationName.size()];
+		operationName.toArray(retVal);
+		return retVal;
 	}
 	
 	/**
@@ -269,6 +329,7 @@ public class WSDLInfoBean {
 	public boolean checkForOperation(String _operationName){
 		return operations.containsKey(_operationName);
 	}
+	
 	/**
 	 * Add a simpleType definition
 	 * @param _simpleTypeName is the simpleType name
@@ -285,12 +346,14 @@ public class WSDLInfoBean {
 	 * @return a String array of all the simpleType names
 	 */
 	public String[] getAllSimpleTypes(){
-		ArrayList<String> simpleTypes = new ArrayList<String>();
-		Iterator<String> itSimpleTypes = simpleTypes.iterator();
+		ArrayList<String> sTypes = new ArrayList<String>();
+		Iterator<String> itSimpleTypes = simpleTypes.keySet().iterator();
 		while(itSimpleTypes.hasNext()){
-			simpleTypes.add(itSimpleTypes.next());
+			sTypes.add(itSimpleTypes.next());
 		}
-		return (String[]) simpleTypes.toArray();
+		String[] retVal = new String[simpleTypes.size()];
+		sTypes.toArray(retVal);
+		return retVal;
 	}
 	
 	/**
@@ -303,30 +366,74 @@ public class WSDLInfoBean {
 	}
 	
 	/**
+	 * Get the list of all the Elements in the WSDL
+	 * @return a String array of all the Element names
+	 */
+	public String[] getAllElementNames(){
+		ArrayList<String> eleNames = new ArrayList<String>();
+		Iterator<String> itElementNames = elementNames.keySet().iterator();
+		while(itElementNames.hasNext()){
+			eleNames.add(itElementNames.next());
+		}
+		String[] retVal = new String[eleNames.size()];
+		eleNames.toArray(retVal);
+		return retVal;
+	}
+	
+	/**
+	 * Get the elementType by its Name
+	 * @param _elementName is the ElementName
+	 * @return the elementType with the given ElementName
+	 */
+	public String getElementTypeByName(String _elementName){
+		return elementNames.get(_elementName);
+	}
+	
+	/**
 	 * @return the name
 	 */
-	public String getWsdlName() {
+	public String getServiceName() {
 		return wsdlName;
 	}
 
 	/**
 	 * @param name the name to set
 	 */
-	public void setWsdlName(String name) {
-		this.wsdlName = name;
+	public void setServiceName(String _name) {
+		this.wsdlName = _name;
+	}
+	
+	/**
+	 * @return the wsdlAddress
+	 */
+	public String getWsdlAddress() {
+		return wsdlAddress;
 	}
 
 	/**
-	 * @return the wsdlBinding
+	 * @param wsdlAddress the wsdlAddress to set
 	 */
-	public String getWsdlBinding() {
-		return wsdlBinding;
+	public void setWsdlAddress(String wsdlAddress) {
+		this.wsdlAddress = wsdlAddress;
 	}
 
 	/**
-	 * @param wsdlBinding the wsdlBinding to set
+	 * Print the details of the WSDL Bean
 	 */
-	public void setWsdlBinding(String wsdlBinding) {
-		this.wsdlBinding = wsdlBinding;
+	public String toString(){
+		String retVal = null;
+		retVal = "\n------------ WSDL Information ------------\n";
+		retVal += "\nService Name: \t\t\t"+this.getServiceName();
+		retVal += "\nService Location: \t\t"+this.getWsdlAddress();
+		retVal += "\nNumber of Inputs: \t\t"+this.getAllWsdlInputMessages().length;
+		retVal += "\nNumber of Outputs: \t\t"+this.getAllWsdlOutputMessages().length;
+		retVal += "\nNumber of Messages: \t\t"+this.getAllMessages().length;
+		retVal += "\nNumber of SimpleTypes: \t\t"+this.getAllSimpleTypes().length;
+		retVal += "\nNumber of ComplexTypes: \t"+this.getAllComplexTypes().length;
+		retVal += "\nNumber of Elements: \t\t"+this.getAllElementNames().length;
+		retVal += "\nNumber of PortTypes: \t\t"+this.getAllPortTypes().length;
+		retVal += "\nNumber of Operations: \t\t"+this.getAllOperations().length;
+		retVal += "\nNumber of Ports: \t\t"+this.getAllPortNames().length;
+		return retVal;
 	}
 }

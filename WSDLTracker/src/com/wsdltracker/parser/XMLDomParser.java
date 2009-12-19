@@ -83,13 +83,6 @@ public class XMLDomParser implements ErrorHandler {
 			nodeStack.push(n);
 			WSDLTrackerLogger.logThis(Level.TRACE, WSDLHelper.getStackTrace(nodeStack));
 			WSDLDataProcessor.doWSDLNodeProcessing(n, nodeStack, wsdlBean);
-			//System.out.println("Start: "+WSDLHelper.getLastNodeName(nodePath));
-			/*for(int i=0; i<n.getAttributes().getLength();i++){
-				Node attNode = n.getAttributes().item(i);
-				nodePath.add(attNode.getNodeName());
-				//System.out.println(WSDLHelper.getNodePath(nodePath)+": "+attNode.getNodeValue());
-				nodePath.remove(attNode.getNodeName());
-			}*/
 			NodeList nl = n.getChildNodes();
 			Node newNode = null;
 			for(int i=1;i<(nl.getLength());i++)
@@ -97,7 +90,6 @@ public class XMLDomParser implements ErrorHandler {
 				newNode = nl.item(i);
 				parseNode(newNode);
 			}
-			//System.out.println("End: "+nodeStack.peek());
 			nodeStack.pop();
 			WSDLTrackerLogger.logThis(Level.TRACE, WSDLHelper.getStackTrace(nodeStack));
 			nodePath.remove(n.getNodeName());
@@ -107,19 +99,10 @@ public class XMLDomParser implements ErrorHandler {
 			if(n.getNodeValue() == null)
 			{
 				nodePath.add(n.getNodeName());
-				//System.out.println(WSDLHelper.getLastNodeName(nodePath));
 				nodeStack.push(n);
 				WSDLTrackerLogger.logThis(Level.TRACE, WSDLHelper.getStackTrace(nodeStack));
 				WSDLDataProcessor.doWSDLNodeProcessing(n, nodeStack, wsdlBean);
-				/*for(int i=0; i<n.getAttributes().getLength();i++){
-					Node attNode = n.getAttributes().item(i);
-					nodePath.add(attNode.getNodeName());
-					//System.out.println(WSDLHelper.getNodePath(nodePath)+": "+attNode.getNodeValue());
-					nodePath.remove(attNode.getNodeName());
-				}*/
-				//System.out.println(WSDLHelper.getLastNodeName(nodePath));
 				nodeStack.pop();
-				//System.out.println(WSDLHelper.getStackTrace(nodeStack));
 				WSDLTrackerLogger.logThis(Level.TRACE, WSDLHelper.getStackTrace(nodeStack));
 				nodePath.remove(n.getNodeName());
 			}
