@@ -16,6 +16,7 @@ public class WSDLInfoBean {
 	
 	private String wsdlName = null;
 	private String wsdlAddress = null;
+	private HashMap<String, String> arrayCtTypes = null;
 	private HashMap<String, String> wsdlBindings = null;
 	private HashMap<String, String> wsdlInputs = null; // Mapping to Store WSDL {OperationName --> Message} 
 	private HashMap<String, String> wsdlOutputs = null; // Mapping to Store WSDL {OperationName --> Message}
@@ -30,6 +31,7 @@ public class WSDLInfoBean {
 	private HashMap<String, ArrayList<String>> portTypeNames = null; // Mapping to capture {portTypeName --> operation} relationship
 	private HashMap<String, HashMap<String, String>> operations = null;
 	private HashMap<String, String> port = null;
+	private WSDLTermMatrix termMatrix = null;
 	
 	/**
 	 * Default constructor 
@@ -45,6 +47,7 @@ public class WSDLInfoBean {
 		port = new HashMap<String, String>();
 		wsdlInputs = new HashMap<String, String>();
 		wsdlOutputs = new HashMap<String, String>();
+		arrayCtTypes = new HashMap<String, String>();
 	}
 	
 	/**
@@ -111,6 +114,40 @@ public class WSDLInfoBean {
 		String[] retVal = new String[messageTypes.size()];
 		messageTypes.toArray(retVal);
 		return retVal;
+	}
+	
+	/**
+	 * Add a complexType arrayType definition
+	 * @param _arrayCtName is the array ComplexType name
+	 * @param _arrayType is the arrayType
+	 */
+	public void addArrayComplexType(String _arrayCtName, String _arrayType){
+		arrayCtTypes.put(_arrayCtName, _arrayType);
+	}
+	
+	/**
+	 * Get all the Array ComplexType names
+	 * @return a String array of all the array ComplexType names
+	 */
+	public String[] getAllCtArrayNames(){
+		ArrayList<String> arrCtTypes = new ArrayList<String>();
+		Iterator<String> itArrayCtTypes = arrayCtTypes.keySet().iterator();
+		while(itArrayCtTypes.hasNext()){
+			arrCtTypes.add((String)itArrayCtTypes.next());
+		}
+		String[] retVal = new String[arrayCtTypes.size()];
+		arrCtTypes.toArray(retVal);
+		return retVal;
+	}
+	
+	
+	/**
+	 * Get the ArrayType associated to a ComplexType
+	 * @param _ctTypeName is the ComplexType name
+	 * @return the arrayType associated with the given ComplexType
+	 */
+	public String getCtArrayTypeByName(String _ctTypeName){
+		return arrayCtTypes.get(_ctTypeName);
 	}
 	
 	/**
@@ -418,6 +455,20 @@ public class WSDLInfoBean {
 	}
 
 	/**
+	 * @return the termMatrix
+	 */
+	public WSDLTermMatrix getTermMatrix() {
+		return termMatrix;
+	}
+
+	/**
+	 * @param termMatrix the termMatrix to set
+	 */
+	public void setTermMatrix(WSDLTermMatrix termMatrix) {
+		this.termMatrix = termMatrix;
+	}
+
+	/**
 	 * Print the details of the WSDL Bean
 	 */
 	public String toString(){
@@ -434,6 +485,8 @@ public class WSDLInfoBean {
 		retVal += "\nNumber of PortTypes: \t\t"+this.getAllPortTypes().length;
 		retVal += "\nNumber of Operations: \t\t"+this.getAllOperations().length;
 		retVal += "\nNumber of Ports: \t\t"+this.getAllPortNames().length;
+		retVal += "\nNumber of UniqueTerms: \t"+this.getTermMatrix().getMatrixSize();
+		retVal += "\n----****---- Term matrix ----****----\n"+this.getTermMatrix();
 		return retVal;
 	}
 }

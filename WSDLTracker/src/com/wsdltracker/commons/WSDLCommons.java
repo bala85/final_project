@@ -22,12 +22,13 @@ public class WSDLCommons {
 	public static final String WSDL_NODENAME_INPUT = "input";
 	public static final String WSDL_NODENAME_OUTPUT = "output";
 	public static final String WSDL_NODENAME_ADDRESS = "address";
+	public static final String WSDL_NODENAME_ATTRIBUTE = "attribute";
 	
 	public static final short QUALIFIER_XSD = 1;
 	
-	
 	public static final String CONFIG_LOG4JLOGGER = "log4jLogger";
 	public static final String CONFIG_WSDLTRACKER_FN = "properties/WSDLTrackerConfig.properties";
+	public static final String CONFIG_INPUTFOLDER = "wsdlTrackerInputFolder";
 	
 	public static final String FILENAME_LOGFILENAME = "log4jOutputLogFileName";
 	
@@ -38,4 +39,5 @@ public class WSDLCommons {
 	
 	public static final String QUALIFIER_WSDL_TAG = "wsdl";
 	public static final String QUALIFIER_SOAP_TAG = "soap";
+	public static final String QUALIFIER_XSD_TAG = "xsd";
 }

@@ -46,6 +46,18 @@ public class WSDLDataProcessor {
 				_bean.addWSDLTypeElementName(elementName, elementType);
 			}
 		}
+		else if(currNodeName.equals(WSDLCommons.WSDL_NODENAME_ATTRIBUTE)){
+			Node parentCtypeNode = WSDLHelper.isInStack(_nodeStack, WSDLCommons.XSD_NODENAME_COMPLEXTYPE, WSDLCommons.QUALIFIER_XSD);
+			if(parentCtypeNode!=null){
+				if(qualifier.equals(WSDLCommons.QUALIFIER_XSD_TAG)){
+					String parentCtName = parentCtypeNode.getAttributes().getNamedItem("name").getNodeValue();
+					String arrayType =  _currentNode.getAttributes().
+						getNamedItem(WSDLCommons.QUALIFIER_WSDL_TAG+":arrayType").getNodeValue();
+					arrayType = arrayType.substring(arrayType.contains(":")?(arrayType.indexOf(":")+1):0, arrayType.length()-2);
+					_bean.addArrayComplexType(parentCtName, arrayType);
+				}
+			}
+		}
 		else if(currNodeName.equals(WSDLCommons.XSD_NODENAME_SIMPLETYPE)){
 			String elementName = _currentNode.getAttributes().getNamedItem("name").getNodeValue();
 			String elementType = _currentNode.getChildNodes().item(1).getAttributes().getNamedItem("base").getNodeValue();;
