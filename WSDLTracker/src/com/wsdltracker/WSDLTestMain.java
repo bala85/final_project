@@ -7,11 +7,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.apache.log4j.Level;
 
 import com.wsdlprocessor.ProcessWSDLData;
+import com.wsdlprocessor.data.WSDLGlobalTermMatrix;
 import com.wsdltracker.beans.WSDLInfoBean;
 import com.wsdltracker.beans.WSDLTermMatrix;
 import com.wsdltracker.commons.WSDLCommons;
@@ -20,7 +20,6 @@ import com.wsdltracker.utils.WSDLTrackerUtilities;
 
 /**
  * @author Bala Rajagopal
- *
  */
 public class WSDLTestMain {
 
@@ -39,13 +38,21 @@ public class WSDLTestMain {
 				inFiles = inputFolder.listFiles();
 			}
 			ProcessWSDLData wsdlProcessor = new ProcessWSDLData();
-			HashMap<String, Object> globalTermMatrix = new HashMap<String, Object>();
+			//HashMap<String, Object> globalTermMatrix = new HashMap<String, Object>();
 			ArrayList<WSDLInfoBean> wsdlData = wsdlProcessor.processWSDLData(inFiles);
+			WSDLGlobalTermMatrix globalTermMatrix = new WSDLGlobalTermMatrix();
 			for(WSDLInfoBean _currBean : wsdlData){
 				WSDLTermMatrix termMatrix = _currBean.getTermMatrix();
-				globalTermMatrix.put(_currBean.getServiceName(), termMatrix.getMatrixData());
+				//globalTermMatrix.put(_currBean.getServiceName(), termMatrix.getMatrixData());
+				globalTermMatrix.processTermMatrix(_currBean.getServiceName(), termMatrix);
 			}
 			WSDLTrackerLogger.logThis(Level.DEBUG, globalTermMatrix);
+			globalTermMatrix.persistData(WSDLTrackerUtilities.loadProperties(
+							WSDLCommons.CONFIG_WSDLTRACKER_FN).
+							getProperty(WSDLCommons.CONFIG_TERMMATRIX_OUTFOLDER));
+			/*WSDLClientGenerator clientGen = new WSDLClientGenerator();
+			clientGen.generateWSDLClient(inFiles);*/
+			
 		} catch (WSDLTrackerException e) {
 			if(e.getSeverity()==Level.FATAL)
 				System.exit(1);

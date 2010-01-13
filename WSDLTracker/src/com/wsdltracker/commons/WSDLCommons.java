@@ -29,6 +29,10 @@ public class WSDLCommons {
 	public static final String CONFIG_LOG4JLOGGER = "log4jLogger";
 	public static final String CONFIG_WSDLTRACKER_FN = "properties/WSDLTrackerConfig.properties";
 	public static final String CONFIG_INPUTFOLDER = "wsdlTrackerInputFolder";
+	public static final String CONFIG_CLIENTSTUB_OUTFOLDER = "wsdlTrackerClientStubOutputFolder";
+	public static final String CONFIG_TERMMATRIX_OUTFOLDER = "wsdlTrackerMatrixDumpFolder";
+	public static final String CONFIG_JBOSS_BIN_FOLDER = "jbossBinDirectory";
+	public static final String CONFIG_AXIS2_BIN_FOLDER = "axis2BinDirectory";
 	
 	public static final String FILENAME_LOGFILENAME = "log4jOutputLogFileName";
 	
