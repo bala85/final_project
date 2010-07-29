@@ -47,9 +47,9 @@ public class WSDLTestMain {
 				globalTermMatrix.processTermMatrix(_currBean.getServiceName(), termMatrix);
 			}
 			WSDLTrackerLogger.logThis(Level.DEBUG, globalTermMatrix);
-			globalTermMatrix.persistData(WSDLTrackerUtilities.loadProperties(
+			/*globalTermMatrix.persistData(WSDLTrackerUtilities.loadProperties(
 							WSDLCommons.CONFIG_WSDLTRACKER_FN).
-							getProperty(WSDLCommons.CONFIG_TERMMATRIX_OUTFOLDER));
+							getProperty(WSDLCommons.CONFIG_TERMMATRIX_OUTFOLDER));*/
 			/*WSDLClientGenerator clientGen = new WSDLClientGenerator();
 			clientGen.generateWSDLClient(inFiles);*/
 			

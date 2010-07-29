@@ -13,8 +13,12 @@ import com.wsdltracker.WSDLTrackerLogger;
 public class WSDLTrackerException extends Throwable {
 
 	private static final long serialVersionUID = -4582122815353162393L;
-	
+
+	/**
+	 * This indicates the Log severity
+	 */
 	private Level severity;
+
 	/**
 	 * Overloaded constructor
 	 * @param _e is the exception
